@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do/module/bnb.dart';
+
+import '../module/task_module.dart';
 
 class newTask extends StatefulWidget {
   const newTask({super.key});
@@ -52,6 +58,7 @@ class _NewtaskState extends State<newTask> {
                           }
                           return null;
                         },
+                        controller: taskName,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           hintText: "Finish UI design for login screen",
@@ -125,8 +132,29 @@ class _NewtaskState extends State<newTask> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () {
-                  if (_kay.currentState?.validate() ?? false) {}
+                onPressed: () async{
+                  if (_kay.currentState?.validate() ?? false) {
+                    final model = TaskModule(
+                        taskName: taskName.text,
+                        taskDescription: taskDescription.text,
+                        isSwitch: isSwitch,);
+                    final pref= await SharedPreferences.getInstance();
+                    final taskJson = pref.getString("task");
+                    List<dynamic> listTask =[];
+                    if(taskJson!=null){
+                      listTask=jsonDecode(taskJson);
+                    }
+                    listTask.add(model.toMap());
+                    final taskEncode= jsonEncode(listTask);
+                  await  pref.setString("task", taskEncode);
+
+Navigator.push(context, MaterialPageRoute(builder: (context){
+  return mainPage();
+
+}));
+
+
+                   }
                 },
                 icon: Icon(Icons.add),
                 label: Text("Add Task"),

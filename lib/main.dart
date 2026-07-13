@@ -16,7 +16,7 @@ void main() async {
  
   Widget firstScreen;
   if (username != null && username.isNotEmpty) {
-    firstScreen = const Welcome();
+    firstScreen = const mainPage();
   } else {
     firstScreen = const Welcome();
   }

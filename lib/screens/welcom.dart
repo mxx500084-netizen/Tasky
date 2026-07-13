@@ -7,28 +7,6 @@ import '../module/bnb.dart';
 
 final TextEditingController controller = TextEditingController();
 final GlobalKey<FormState> _key = GlobalKey<FormState>();
-void _handle(BuildContext context)async{
-  
-                        _key.currentState?.validate();
-
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setString(
-                          'username',
-                          controller.value.text,
-                        );
-                        if (_key.currentState?.validate() ?? false) {
-                          if (!context.mounted) return;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return mainPage();
-                              },
-                            ),
-                          );
-                        }
-                     
-}
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
 
