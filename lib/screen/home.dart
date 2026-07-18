@@ -1,10 +1,5 @@
 import 'dart:convert';
-import 'package:to_do/module/task_module.dart';
-import 'package:to_do/screens/NewTask.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do/app_exports.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});
@@ -16,6 +11,7 @@ class MyWidget extends StatefulWidget {
 class _MyWidgetState extends State<MyWidget> {
   String name = "";
   List<TaskModule> task = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -25,9 +21,14 @@ class _MyWidgetState extends State<MyWidget> {
   }
 
   Future<void> _loadName() async {
+    setState(() {
+      isLoading = true;
+    });
+    await Future.delayed(const Duration(seconds: 1));
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       name = prefs.getString('username') ?? "";
+      isLoading = false;
     });
   }
 
@@ -39,11 +40,10 @@ class _MyWidgetState extends State<MyWidget> {
       final tasks = taskAfterDecode.map((element) {
         return TaskModule.fromjson(element);
       }).toList();
-      print(tasks);
+
       setState(() {
         task = tasks;
       });
-      print("$taskAfterDecode");
     }
   }
 
@@ -54,133 +54,90 @@ class _MyWidgetState extends State<MyWidget> {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
-                    const Image(
-                      image: AssetImage('assets/Leading element.png'),
-                      width: 42,
-                      height: 42,
+                    const CircleAvatar(
+                      backgroundImage: AssetImage('assets/Leading element.png'),
+                      backgroundColor: Colors.transparent,
+                      radius: 20,
                     ),
                     const SizedBox(width: 18),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Good Evening, $name",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
+                        CustomText(
+                          text: "Good Evening, $name",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          color: Colors.white,
                         ),
-                        const Text(
-                          "One task at a time. One step closer.",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
+                        CustomText(
+                          text: "One task at a time. One step closer.",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: Colors.white,
                         ),
                       ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  "Yuhuu ,Your work Is ",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                    fontSize: 32,
-                  ),
+                const
+                CustomText(
+                  text: "Yuhuu ,Your work Is ",
+                  fontWeight: FontWeight.w400,
+                  fontSize: 32,
+                  color: Colors.white,
                 ),
+
                 Row(
                   children: [
-                    const Text(
-                      "almost done !",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontSize: 32,
-                      ),
+                    const
+                    CustomText(
+                      text: "almost done !",
+                      fontWeight: FontWeight.w400,
+                      fontSize: 32,
+                      color: Colors.white,
                     ),
+
                     const SizedBox(width: 8),
                     SvgPicture.asset(
                       "assets/waving-hand-medium-light-skin-tone-svgrepo-com 1.svg",
                     ),
-
                   ],
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: task.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Container(
-
-                                height: 72,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Color(0xff282828),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Checkbox(value: task[index].isDone, onChanged: (bool? value) async {
-
-                                      setState(() {
-                                        task  [index].isDone= value??false;
-
-                                      });
-                                      final pref = await SharedPreferences.getInstance();
-
-                                      final String taskEncode = jsonEncode(task.map((element) => element.toMap()).toList());
-
-                                      await pref.setString("task", taskEncode);
-                                    }
-                                    ,
-                                      activeColor: Color(0xff15B86C),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(4)),
-                                    ),Expanded(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                        Text(task[index].taskName,maxLines: 1,overflow:TextOverflow.ellipsis , style: TextStyle(
-                                            decoration: task[index].isDone ? TextDecoration.lineThrough: TextDecoration.none,
-
-                                      color:task[index].isDone? Color(0xffA0A0A0):Color(0xffFFFCFC) ,
-                                                                      fontSize: 20),),
-                                        Text(task[index].taskDescription, overflow:TextOverflow.ellipsis ,style: TextStyle(color: Color(0xffC6C6C6),fontSize: 14),),
-                                      ],),
-                                    )
-                                  ,
-                                    IconButton(onPressed: (){}, icon: Icon(Icons.more_vert))
-                                  
-                                  ],
-                                ),
-
-
-                          ),
-                      );
-                    },
-                  ),
-                ),],
+                  child: isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : ListWidget(
+                          tasks: task,
+                          ontap: (bool? value, int index) async {
+                            setState(() {
+                              task[index].isDone = value ?? false;
+                            });
+                            final pref = await SharedPreferences.getInstance();
+                            final String taskEncode = jsonEncode(
+                              task.map((element) => element.toMap()).toList(),
+                            );
+                            await pref.setString("task", taskEncode);
+                          },
+                        ),
+                ),
+              ],
             ),
           ),
         ),
         floatingActionButton: SizedBox(
           height: 44,
           child: FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) {
@@ -188,6 +145,7 @@ class _MyWidgetState extends State<MyWidget> {
                   },
                 ),
               );
+              _loadTask();
             },
             backgroundColor: const Color(0xff15B86C),
             foregroundColor: Colors.white,

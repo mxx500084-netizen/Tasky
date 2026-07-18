@@ -1,35 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // ضفنا مكتبة الـ SharedPreferences
-import 'package:to_do/screens/welcom.dart';
-import 'package:to_do/module/bnb.dart';
-import 'screen/home.dart';
+import 'package:to_do/app_exports.dart';
+
 
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
-
- 
-  final prefs = await SharedPreferences.getInstance();
-  final String? username = prefs.getString('username');
-
- 
-  Widget firstScreen;
-  if (username != null && username.isNotEmpty) {
-    firstScreen = const mainPage();
-  } else {
-    firstScreen = const Welcome();
-  }
-
-
-  runApp(MyApp(initialScreen: firstScreen));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  final Widget initialScreen;
-
-  const MyApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +18,44 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           scaffoldBackgroundColor: Color(0xff181818),
+          appBarTheme: AppBarTheme(
+            titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+        foregroundColor: Colors.white,
+        backgroundColor: const Color(0XFF181818),
+          iconTheme: IconThemeData(
+            color: Color(0XFFFFFCFC)
+          ),
+          ),
+          checkboxTheme: CheckboxThemeData(
+            fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+              if (states.contains(WidgetState.selected)) {
+                return const Color(0xff15B86C);
+              }
+              return Colors.transparent;
+            }),
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          switchTheme:SwitchThemeData(trackColor:  WidgetStateProperty.resolveWith((states){
+            if(states.contains(WidgetState.selected)){
+             return Color(0xff15B86C);
+            };
+            return Colors.white;
+
+          })
+            ,thumbColor:  WidgetStateProperty.resolveWith((states){
+                if(states.contains(WidgetState.selected)){
+                  return Colors.white;
+                };
+                return Color(0xff9E9E9E);
+
+              })
+            ,),
           useMaterial3: true),
 
-      home: initialScreen,
+      home: const splash(),
     );
   }
 }

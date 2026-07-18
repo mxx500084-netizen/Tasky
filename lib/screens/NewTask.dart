@@ -1,10 +1,5 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:to_do/module/bnb.dart';
-
-import '../module/task_module.dart';
+import 'package:to_do/app_exports.dart';
 
 class newTask extends StatefulWidget {
   const newTask({super.key});
@@ -15,21 +10,25 @@ class newTask extends StatefulWidget {
 
 bool isSwitch = false;
 GlobalKey<FormState> _kay = GlobalKey();
-TextEditingController taskName = TextEditingController();
-TextEditingController taskDescription = TextEditingController();
 
-class _NewtaskState extends State<newTask> {
+
+class _NewtaskState extends State<newTask> {TextEditingController taskName = TextEditingController();
+TextEditingController taskDescription = TextEditingController();
+  @override
+  void dispose() {
+    taskName.dispose();
+    taskDescription.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "New Task",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+
         ),
-        centerTitle: false,
-        foregroundColor: Colors.white,
-        backgroundColor: const Color(0XFF181818),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -42,88 +41,40 @@ class _NewtaskState extends State<newTask> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Task Name",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      CustomText(text: "Task Name",fontSize: 16,fontWeight: FontWeight.w400,color:Colors.white ,)
+                     ,
                       SizedBox(height: 8),
-                      TextFormField(
-                        validator: (String? value) {
-                          if (value!.trim().isEmpty) {
-                            return "Please Enter Task Name ";
-                          }
+                      Textform(controller1:  taskName, validator: (String? value) {
+                        if (value?.trim().isEmpty ?? false) {
+                          return "please enter your full name";
+                        } else {
                           return null;
-                        },
-                        controller: taskName,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: "Finish UI design for login screen",
-                          hintStyle: TextStyle(color: Color(0xff6D6D6D)),
-                          filled: true,
-                          fillColor: Color(0xff282828),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                        }
+                      } , color: Colors.white,
+                          text: "Finish UI design for login screen"
                       ),
+
                       SizedBox(height: 20),
-                      Text(
-                        "Task Description",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      CustomText(text: "Task Description",fontSize: 16,fontWeight: FontWeight.w400,color:Colors.white ,)
+,
                       SizedBox(height: 8),
-                      TextFormField(
-                        controller: taskDescription,
-                        validator: (String? value) {
-                          if (value!.trim().isEmpty) {
-                            return "Please Enter task Description";
-                          }
-                          return null;
-                        },
-                        maxLines: 5,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText:
-                              "Finish onboarding UI and hand off to devs by Thursday.",
-                          hintStyle: TextStyle(color: Color(0xff6D6D6D)),
-                          filled: true,
-                          hintMaxLines: 5,
-                          fillColor: Color(0xff282828),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                      Textform(controller1:  taskDescription, validator: (String? value) {return null;} , color: Colors.white,maxLines: 5,
+                          text: "Finish onboarding UI and hand off to devs by Thursday."
                       ),
+
                       SizedBox(height: 28),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "High Priority",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Switch(
+                          CustomText(text: "High Priority",color: Colors.white,fontSize: 16,fontWeight: FontWeight.w400,)
+
+                          ,Switch(
                             value: isSwitch,
                             onChanged: (bool newvalue) {
                               setState(() {
                                 isSwitch = newvalue;
                               });
                             },
-                            activeTrackColor: Color(0xff15B86C),
                             ),
                         ],
                       ),
@@ -131,7 +82,7 @@ class _NewtaskState extends State<newTask> {
                   ),
                 ),
               ),
-              ElevatedButton.icon(
+              CustomButton(
                 onPressed: () async{
                   if (_kay.currentState?.validate() ?? false) {
                     final model = TaskModule(
@@ -148,21 +99,15 @@ class _NewtaskState extends State<newTask> {
                     final taskEncode= jsonEncode(listTask);
                   await  pref.setString("task", taskEncode);
 
-Navigator.push(context, MaterialPageRoute(builder: (context){
-  return mainPage();
-
-}));
-
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
 
                    }
                 },
                 icon: Icon(Icons.add),
-                label: Text("Add Task"),
-                style: ElevatedButton.styleFrom(
-                  fixedSize: Size(343, 40),
-                  backgroundColor: Color(0xff15B86C),
-                  foregroundColor: Colors.white,
-                ),
+                text:"Add Task",
+
               ),
               SizedBox(height: 10),
             ],

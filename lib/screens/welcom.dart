@@ -1,14 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:to_do/screen/home.dart';
-
-import '../module/bnb.dart';
+import 'package:to_do/app_exports.dart';
 
 final TextEditingController controller = TextEditingController();
 final GlobalKey<FormState> _key = GlobalKey<FormState>();
-class Welcome extends StatelessWidget {
+
+class Welcome extends StatefulWidget {
   const Welcome({super.key});
+
+  @override
+  State<Welcome> createState() => _WelcomeState();
+}
+
+class _WelcomeState extends State<Welcome> {
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +36,11 @@ class Welcome extends StatelessWidget {
                       height: 42,
                     ),
                     SizedBox(width: 16),
-                    const Text(
-                      "Task",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xffFFFFFF),
-                      ),
+                    CustomText(
+                      text: "Task",
+                      fontSize: 28,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xffFFFFFF),
                     ),
                   ],
                 ),
@@ -42,15 +48,13 @@ class Welcome extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Welcome To Tasky",
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Color(0xffFFFCFC),
-                        fontWeight: FontWeight.w400,
-                      ),
+                    CustomText(
+                      text: "Welcome To Tasky",
+                      color: Color(0xffFFFCFC),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w400,
                     ),
-                    const SizedBox(width:8 ),
+                    const SizedBox(width: 8),
                     SvgPicture.asset(
                       "assets/waving-hand-medium-light-skin-tone-svgrepo-com 1.svg",
                       width: 28,
@@ -61,13 +65,11 @@ class Welcome extends StatelessWidget {
                 const SizedBox(width: 8),
                 Column(
                   children: [
-                    const Text(
-                      "Your productivity journey starts here.",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        color: Color(0xffFFFCFC),
-                      ),
+                    CustomText(
+                      text: "Your productivity journey starts here.",
+                      color: Color(0xffFFFCFC),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
                     ),
                     SizedBox(height: 50),
                     SvgPicture.asset(
@@ -81,113 +83,40 @@ class Welcome extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Full Name",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          CustomText(
+                            text: "Full Name",
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
                           const SizedBox(height: 8),
 
-                          TextFormField(
-                            validator: (String? value) {
-                              if (value?.trim().isEmpty ?? false) {
-                                return "please enter your full name";
-                              } else {
-                                return null;
+                          Textform(controller1:  controller, validator: (String? value) {
+                            if (value?.trim().isEmpty ?? false) {
+                              return "please enter your full name";
+                            } else {
+                              return null;
+                            }
+                          } , color: Color.fromARGB(255, 255, 255, 255),
+                              text: "e.g. Sarah Khalid"
+                          ),
+
+                          SizedBox(height: 24),
+                          CustomButton(
+                            text: "Let’s Get Started",
+                            onPressed: () {
+                              if (_key.currentState!.validate()) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (c) => mainPage()),
+                                );
                               }
                             },
-                            // onFieldSubmitted:(value) async {
-                            //       _key.currentState?.validate();
-                            //
-                            //       final prefs =
-                            //           await SharedPreferences.getInstance();
-                            //       await prefs.setString(
-                            //         'username',
-                            //         controller.value.text,
-                            //       );
-                            //       if (_key.currentState?.validate() ?? false) {
-                            //         if (!context.mounted) return;
-                            //         Navigator.push(
-                            //           context,
-                            //           MaterialPageRoute(
-                            //             builder: (context) {
-                            //               return MyWidget();
-                            //             },
-                            //           ),
-                            //         );
-                            //       }
-                            //     },
-                            controller: controller,
-                            style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-                            cursorColor: Colors.white,
-                            decoration: InputDecoration(
-
-                              // suffixIcon: IconButton(
-                              //   onPressed: () async {
-                              //     _key.currentState?.validate();
-                              //
-                              //     final prefs =
-                              //         await SharedPreferences.getInstance();
-                              //     await prefs.setString(
-                              //       'username',
-                              //       controller.value.text,
-                              //     );
-                              //     if (_key.currentState?.validate() ?? false) {
-                              //       if (!context.mounted) return;
-                              //       Navigator.push(
-                              //         context,
-                              //         MaterialPageRoute(
-                              //           builder: (context) {
-                              //             return MyWidget();
-                              //           },
-                              //         ),
-                              //       );
-                              //     }
-                              //   },
-                              //   icon: Icon(Icons.login),
-                              //   color: Colors.white,
-                              // ),
-
-                              hintText: "e.g. Sarah Khalid",
-                              filled: true,
-                              fillColor: const Color(0xff282828),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
                           ),
+
+
                         ],
                       ),
-                    ),
-                    SizedBox(height: 24),
-
-                    ElevatedButton(
-                      onPressed: () async {
-                        _key.currentState?.validate();
-
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setString(
-                          'username',
-                          controller.value.text,
-                        );
-                        if (_key.currentState?.validate() ?? false) {
-                          if (!context.mounted) return;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return mainPage();
-                              },
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: Size(343, 40),
-                        backgroundColor: Color(0xff15B86C),
-                        foregroundColor: Color(0xffFFFCFC),
-                      ),
-                      child: Text("Let’s Get Started"),
                     ),
                   ],
                 ),
