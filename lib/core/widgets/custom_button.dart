@@ -1,4 +1,5 @@
-import 'package:to_do/app_exports.dart';
+import 'package:flutter/material.dart';
+import 'package:to_do/core/constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -19,13 +20,12 @@ class CustomButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           fixedSize: const Size(double.maxFinite, 40),
-          backgroundColor: const Color(0xff15B86C),
-          foregroundColor: const Color(0xffFFFCFC),
+          backgroundColor: AppColors.primaryGreen,
+          foregroundColor: AppColors.textWhite,
         ),
         child: Text(text),
       );
     }
-
 
     return ElevatedButton.icon(
       onPressed: onPressed,
@@ -33,8 +33,8 @@ class CustomButton extends StatelessWidget {
       label: Text(text),
       style: ElevatedButton.styleFrom(
         fixedSize: const Size(double.maxFinite, 40),
-        backgroundColor: const Color(0xff15B86C),
-        foregroundColor: const Color(0xffFFFCFC),
+        backgroundColor: AppColors.primaryGreen,
+        foregroundColor: AppColors.textWhite,
       ),
     );
   }

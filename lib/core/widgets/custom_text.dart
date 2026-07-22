@@ -1,4 +1,4 @@
-import 'package:to_do/app_exports.dart';
+import 'package:flutter/material.dart';
 
 class CustomText extends StatelessWidget {
   final String text;
@@ -9,7 +9,7 @@ class CustomText extends StatelessWidget {
   const CustomText({
     super.key,
     required this.text,
-     this.color=Colors.white,
+    this.color = Colors.white,
     this.fontSize = 16,
     this.fontWeight = FontWeight.w400,
   });
