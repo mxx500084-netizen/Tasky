@@ -1,7 +1,6 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do/app_exports.dart';
 
-
+import '../../core/constants/storageKey.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -43,11 +42,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         height: 42.h,
                       ),
                       Gap(16.w),
-                      CustomText(
-                        text: "Task",
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textWhite,
+                      Text(
+                        "Task",
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ],
                   ),
@@ -55,11 +52,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CustomText(
-                        text: "Welcome To Tasky",
-                        color: AppColors.textWhite,
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.w400,
+                      Text(
+                        "Welcome To Tasky",
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       SizedBox(width: 8.w),
                       SvgPicture.asset(
@@ -72,11 +67,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   Gap(8.h),
                   Column(
                     children: [
-                      CustomText(
-                        text: "Your productivity journey starts here.",
-                        color: AppColors.textWhite,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w300,
+                      Text(
+                        "Your productivity journey starts here.",
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Gap(50.h),
                       SvgPicture.asset(
@@ -90,11 +83,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomText(
-                              text: "Full Name",
-                              color: AppColors.textWhite,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w400,
+                            Text(
+                              "Full Name",
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
                             Gap(8.h),
                             CustomTextForm(
@@ -102,7 +93,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               validator: (String? value) {
                                 return null;
                               },
-                              color: AppColors.textWhite,
                               text: "e.g. Sarah Khalid",
                             ),
                             Gap(24.h),
@@ -113,31 +103,36 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                                 if (name.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      backgroundColor: Colors.redAccent,
-                                      content: Text(
+                                    SnackBar(
+                                      backgroundColor: Theme.of(context).colorScheme.error,
+                                      content: const Text(
                                         "Please enter your full name",
                                       ),
                                     ),
                                   );
                                   return;
                                 }
-                                await PreferencesManager().setString('username',name );
-                                await PreferencesManager().setString('motivationQuote',"One task at a time. One step closer." );
-
-
+                                await PreferencesManager().setString(
+                                  Storagekey.username,
+                                  name,
+                                );
+                                await PreferencesManager().setString(
+                                  Storagekey.motivationQuote,
+                                  "One task at a time. One step closer.",
+                                );
 
                                 if (context.mounted) {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (c) => const MainNavigationScreen(),
+                                      builder: (c) =>
+                                          const MainNavigationScreen(),
                                     ),
                                   );
                                 }
                               },
                             ),
-                            Gap(50.h)
+                            Gap(50.h),
                           ],
                         ),
                       ),

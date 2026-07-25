@@ -43,11 +43,35 @@ class _CompletedScreenState extends State<CompletedScreen> {
     _loadTasks();
   }
 
+  void _onActionSelected(TaskModel task, TaskAction action) async {
+    if (action == TaskAction.edit) {
+      final index = _allTasks.indexOf(task);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewTaskScreen(
+            taskToEdit: task,
+            taskIndex: index,
+          ),
+        ),
+      );
+      _loadTasks();
+    } else if (action == TaskAction.delete) {
+      setState(() {
+        _allTasks.remove(task);
+      });
+      final String encoded = jsonEncode(_allTasks.map((e) => e.toJson()).toList());
+      await PreferencesManager().setString('task_list', encoded);
+      _loadTasks();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Completed Tasks"),
+        centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -55,7 +79,7 @@ class _CompletedScreenState extends State<CompletedScreen> {
             ? Center(
                 child: Text(
                   "No completed tasks yet!",
-                  style: TextStyle(color: AppColors.textWhite, fontSize: 14.sp),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14.sp),
                 ),
               )
             : ListView.separated(
@@ -67,6 +91,7 @@ class _CompletedScreenState extends State<CompletedScreen> {
                   return TaskListItem(
                     task: task,
                     onStatusChanged: (val) => _toggleTaskStatus(task, val),
+                    onActionSelected: (action) => _onActionSelected(task, action),
                   );
                 },
               ),

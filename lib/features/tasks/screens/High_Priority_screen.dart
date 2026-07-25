@@ -42,6 +42,29 @@ class _HighPriorityScreenState extends State<HighPriorityScreen> {
     _loadTasks();
   }
 
+  void _onActionSelected(TaskModel task, TaskAction action) async {
+    if (action == TaskAction.edit) {
+      final index = _allTasks.indexOf(task);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewTaskScreen(
+            taskToEdit: task,
+            taskIndex: index,
+          ),
+        ),
+      );
+      _loadTasks();
+    } else if (action == TaskAction.delete) {
+      setState(() {
+        _allTasks.remove(task);
+      });
+      final String encoded = jsonEncode(_allTasks.map((e) => e.toJson()).toList());
+      await PreferencesManager().setString('task_list', encoded);
+      _loadTasks();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +77,7 @@ class _HighPriorityScreenState extends State<HighPriorityScreen> {
             ? Center(
                 child: Text(
                   "No high priority tasks!",
-                  style: TextStyle(color: AppColors.textWhite, fontSize: 14.sp),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14.sp),
                 ),
               )
             : ListView.separated(
@@ -66,8 +89,8 @@ class _HighPriorityScreenState extends State<HighPriorityScreen> {
                   return TaskListItem(
                     task: task,
                     onStatusChanged: (val) => _toggleTaskStatus(task, val),
+                    onActionSelected: (action) => _onActionSelected(task, action),
                   );
-
                 },
               ),
       ),

@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (username != null && username.isNotEmpty) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
       );
     } else {
       Navigator.pushReplacement(
@@ -37,14 +37,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SizedBox.expand(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body:
+      ThemeController.themeNotifier.value == ThemeMode.dark ?
+      SizedBox.expand(
         child: Stack(
           children: [
             Center(
               child: SvgPicture.asset(
                 AppAssets.logo,
-                width: 150.w,
+                width: 130.w,
               ),
             ),
             Positioned(
@@ -59,7 +61,10 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ],
         ),
-      ),
+      ):
+      Center(
+        child: SvgPicture.asset(AppAssets.logo,width: 130,),
+      )
     );
   }
 }

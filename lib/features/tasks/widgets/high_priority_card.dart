@@ -7,7 +7,7 @@ class HighPriorityCard extends StatelessWidget {
   final void Function(TaskModel task, bool? isDone) onStatusChanged;
   final VoidCallback? onNavigateBack;
 
-   const HighPriorityCard({
+  const HighPriorityCard({
     super.key,
     required this.highPriorityTasks,
     required this.onStatusChanged,
@@ -20,30 +20,28 @@ class HighPriorityCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16.r),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Expanded(
+          Padding(
+            padding: EdgeInsets.only(
+              right: 40.w,
+            ), // Leave space for the clickable shape
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "High Priority Tasks",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGreen,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
                 SizedBox(height: 4.h),
                 if (highPriorityTasks.isEmpty)
                   Text(
                     "No high priority tasks",
-                    style: TextStyle(fontSize: 12.sp, color: AppColors.textGrey),
+                    style: Theme.of(context).textTheme.displaySmall,
                   )
                 else
                   ...highPriorityTasks.reversed
@@ -53,9 +51,15 @@ class HighPriorityCard extends StatelessWidget {
                           children: [
                             Checkbox(
                               value: task.isDone,
-                              activeColor: AppColors.primaryGreen,
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: const VisualDensity(horizontal: 4, vertical: 1),
+                              activeColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: const VisualDensity(
+                                horizontal: 4,
+                                vertical: 1,
+                              ),
                               onChanged: (bool? newValue) {
                                 onStatusChanged(task, newValue);
                               },
@@ -64,10 +68,22 @@ class HighPriorityCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 task.taskName,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.white,
-                                ),
+                                style: task.isDone
+                                    ? TextStyle(
+                                        fontSize: 14.sp,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall?.color ??
+                                            const Color(0xFF6A6A6A),
+                                        decoration: TextDecoration.lineThrough,
+                                      )
+                                    : TextStyle(
+                                        fontSize: 14.sp,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                               ),
                             ),
                           ],
@@ -76,19 +92,31 @@ class HighPriorityCard extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HighPriorityScreen(),
+          Positioned(
+            bottom: -10.h,
+            right: -10.w,
+            child: GestureDetector(
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HighPriorityScreen(),
+                  ),
+                );
+                if (onNavigateBack != null) {
+                  onNavigateBack!();
+                }
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(16.r),
                 ),
-              );
-              if (onNavigateBack != null) {
-                onNavigateBack!();
-              }
-            },
-            child: SvgPicture.asset(AppAssets.splashShapeBottomRight, width: 50),
+                child: SvgPicture.asset(
+                  AppAssets.splashShapeBottomRight,
+                  width: 50.w,
+                ),
+              ),
+            ),
           ),
         ],
       ),

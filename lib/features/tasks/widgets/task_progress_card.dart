@@ -18,7 +18,7 @@ class TaskProgressCard extends StatelessWidget {
     return Container(
       width: double.maxFinite,
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Padding(
@@ -30,20 +30,20 @@ class TaskProgressCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomText(
-                  text: "Achieved Tasks",
-                  color: AppColors.textWhite,
+                Text(
+                  "Achieved Tasks",
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Gap(4.h),
-                CustomText(
-                  text: "$done Out of $total Done",
-                  color: AppColors.textWhite,
-                  fontWeight: FontWeight.w300,
+                Text(
+                  "$done Out of $total Done",
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),
             Stack(
               alignment: Alignment.center,
+
               children: [
                 Transform.rotate(
                   angle: -pi / 2,
@@ -51,14 +51,13 @@ class TaskProgressCard extends StatelessWidget {
                     value: present,
                     strokeWidth: 7,
                     strokeAlign: 3,
-                    color: AppColors.primaryGreen,
-                    backgroundColor: Colors.white,
+                    color: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                   ),
                 ),
-                CustomText(
-                  text: "${(present * 100).toInt()}%",
-                  color: AppColors.textWhite,
-                  fontSize: 12.sp,
+                Text(
+                  "${(present * 100).toInt()}%",
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
               ],
             ),

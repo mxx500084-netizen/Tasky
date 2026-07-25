@@ -29,55 +29,43 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.background,
-        unselectedItemColor: AppColors.textGrey,
-        selectedItemColor: AppColors.primaryGreen,
+
+        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         items: [
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppAssets.navHome,
-              colorFilter: ColorFilter.mode(
-                _currentScreen == 0
-                    ? AppColors.primaryGreen
-                    : AppColors.textGrey,
-                BlendMode.srcIn,
-              ),
+            icon: CustomSvg(
+              path: AppAssets.navHome,
+              color: _currentScreen == 0
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppAssets.navToDo,
-              colorFilter: ColorFilter.mode(
-                _currentScreen == 1
-                    ? AppColors.primaryGreen
-                    : AppColors.textGrey,
-                BlendMode.srcIn,
-              ),
+            icon: CustomSvg(
+              path: AppAssets.navToDo,
+              color: _currentScreen == 1
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             label: "To Do",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppAssets.navComplete,
-              colorFilter: ColorFilter.mode(
-                _currentScreen == 2
-                    ? AppColors.primaryGreen
-                    : AppColors.textGrey,
-                BlendMode.srcIn,
-              ),
+            icon: CustomSvg(
+              path: AppAssets.navComplete,
+              color: _currentScreen == 2
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             label: "Complete",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              AppAssets.navProfile,
-              colorFilter: ColorFilter.mode(
-                _currentScreen == 3
-                    ? AppColors.primaryGreen
-                    : AppColors.textGrey,
-                BlendMode.srcIn,
-              ),
+            icon: CustomSvg(
+              path: AppAssets.navProfile,
+              color: _currentScreen == 3
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             label: "Profile",
           ),

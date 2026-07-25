@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/core/constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -16,26 +15,13 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (icon == null) {
-      return ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          fixedSize: const Size(double.maxFinite, 40),
-          backgroundColor: AppColors.primaryGreen,
-          foregroundColor: AppColors.textWhite,
-        ),
-        child: Text(text),
-      );
+      return ElevatedButton(onPressed: onPressed, child: Text(text));
     }
 
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: icon!,
       label: Text(text),
-      style: ElevatedButton.styleFrom(
-        fixedSize: const Size(double.maxFinite, 40),
-        backgroundColor: AppColors.primaryGreen,
-        foregroundColor: AppColors.textWhite,
-      ),
     );
   }
 }

@@ -1,5 +1,4 @@
-
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 import 'package:to_do/app_exports.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +12,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<TaskModel> tasks = [];
   String? name;
   String? motivationQuote;
+  String? imagePath;
   bool isLoading = true;
 
   int total = 0;
@@ -34,15 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadData() async {
     setState(() => isLoading = true);
     final loadedName = PreferencesManager().getString('username');
-    final loadedQuote =PreferencesManager().getString('motivationQuote');
-    
-    
+    final loadedQuote = PreferencesManager().getString('motivationQuote');
+    final loadedImage = PreferencesManager().getString('profile_image');
+
     final String? storedTasks = PreferencesManager().getString('task_list');
-  
+
     List<TaskModel> loadedTasks = [];
     if (storedTasks != null && storedTasks.isNotEmpty) {
       final List<dynamic> decodedTasks = jsonDecode(storedTasks);
-      loadedTasks = decodedTasks.map((item) => TaskModel.fromJson(item)).toList();
+      loadedTasks = decodedTasks
+          .map((item) => TaskModel.fromJson(item))
+          .toList();
     }
 
     if (!mounted) return;
@@ -51,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       name = loadedName;
       motivationQuote = loadedQuote ?? "One task at a time. One step closer.";
       tasks = loadedTasks;
+      imagePath = loadedImage;
       _updateProgress();
       isLoading = false;
     });
@@ -62,10 +65,30 @@ class _HomeScreenState extends State<HomeScreen> {
       _updateProgress();
     });
 
-
-
     final String encoded = jsonEncode(tasks.map((e) => e.toJson()).toList());
     await PreferencesManager().setString('task_list', encoded);
+  }
+
+  void _onActionSelected(TaskModel task, TaskAction action) async {
+    if (action == TaskAction.edit) {
+      final index = tasks.indexOf(task);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              NewTaskScreen(taskToEdit: task, taskIndex: index),
+        ),
+      );
+      _loadData();
+    } else if (action == TaskAction.delete) {
+      setState(() {
+        tasks.remove(task);
+        _updateProgress();
+      });
+      final String encoded = jsonEncode(tasks.map((e) => e.toJson()).toList());
+      await PreferencesManager().setString('task_list', encoded);
+      _loadData();
+    }
   }
 
   @override
@@ -86,7 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: const AssetImage(AppAssets.userAvatar),
+                          backgroundImage: imagePath != null
+                              ? FileImage(File(imagePath!))
+                              : const AssetImage(AppAssets.userAvatar)
+                                    as ImageProvider,
                           backgroundColor: Colors.transparent,
                           radius: 20.r,
                         ),
@@ -94,38 +120,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomText(
-                              text: "Good Evening, ${name ?? ''}",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16.sp,
-                              color: AppColors.textWhite,
+                            Text(
+                              "Good Evening, ${name ?? ''}",
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
-                            CustomText(
-                              text:
-                                  motivationQuote ??
+                            Text(
+                              motivationQuote ??
                                   "One task at a time. One step closer.",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14.sp,
-                              color: AppColors.textWhite,
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
                         ),
                       ],
                     ),
                     Gap(12.h),
-                    CustomText(
-                      text: "Yuhuu ,Your work Is ",
-                      fontWeight: FontWeight.w400,
-                      fontSize: 24.sp,
-                      color: AppColors.textWhite,
+                    Text(
+                      "Yuhuu ,Your work Is ",
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
                     Row(
                       children: [
-                        CustomText(
-                          text: "almost done !",
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24.sp,
-                          color: AppColors.textWhite,
+                        Text(
+                          "almost done !",
+                          style: Theme.of(context).textTheme.headlineLarge,
                         ),
                         Gap(8.w),
                         SvgPicture.asset(
@@ -136,17 +153,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     Gap(12.h),
-                    TaskProgressCard(present: present, done: done, total: total),
+                    TaskProgressCard(
+                      present: present,
+                      done: done,
+                      total: total,
+                    ),
                     Gap(8.h),
                     HighPriorityCard(
                       highPriorityTasks: highPriorityTasks,
-                      onStatusChanged: (task, val) => _toggleTaskStatus(task, val),
+                      onStatusChanged: (task, val) =>
+                          _toggleTaskStatus(task, val),
                       onNavigateBack: _loadData,
                     ),
                     Gap(12.h),
                     Padding(
                       padding: EdgeInsets.only(top: 4.h, bottom: 8.h),
-                      child: const CustomText(text: "My Tasks", fontSize: 18),
+                      child: Text(
+                        "My Tasks",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -158,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       "No tasks yet",
                       style: TextStyle(
-                        color: AppColors.textWhite,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 14.sp,
                       ),
                     ),
@@ -175,6 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       return TaskListItem(
                         task: task,
                         onStatusChanged: (val) => _toggleTaskStatus(task, val),
+                        onActionSelected: (action) =>
+                            _onActionSelected(task, action),
                       );
                     },
                   ),
@@ -192,8 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
               );
               _loadData();
             },
-            backgroundColor: AppColors.primaryGreen,
-            foregroundColor: AppColors.textWhite,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(100.r),
             ),

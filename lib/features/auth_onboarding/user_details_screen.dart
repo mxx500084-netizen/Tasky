@@ -67,11 +67,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomText(
-                        text: "User Name",
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textWhite,
+                      Text(
+                        "User Name",
+                        style:Theme.of(context).textTheme.titleLarge,
                       ),
                       Gap(8.h),
                       CustomTextForm(
@@ -82,15 +80,13 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                           }
                           return null;
                         },
-                        color: AppColors.textWhite,
+
                         text: "Usama Elgendy",
                       ),
                       Gap(20.h),
-                      CustomText(
-                        text: "Motivation Quote",
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textWhite,
+                      Text(
+                        "Motivation Quote",
+                        style:Theme.of(context).textTheme.titleLarge,
                       ),
                       Gap(8.h),
                       CustomTextForm(
@@ -98,7 +94,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                         validator: (String? value) {
                           return null;
                         },
-                        color: AppColors.textWhite,
+
                         maxLines: 5,
                         text: "One task at a time. One step closer.",
                       ),

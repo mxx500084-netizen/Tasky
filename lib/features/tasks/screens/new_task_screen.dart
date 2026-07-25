@@ -1,8 +1,10 @@
-
 import 'package:to_do/app_exports.dart';
 
 class NewTaskScreen extends StatefulWidget {
-  const NewTaskScreen({super.key});
+  final TaskModel? taskToEdit;
+  final int? taskIndex;
+
+  const NewTaskScreen({super.key, this.taskToEdit, this.taskIndex});
 
   @override
   State<NewTaskScreen> createState() => _NewTaskScreenState();
@@ -15,6 +17,16 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   final TextEditingController taskDescription = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.taskToEdit != null) {
+      taskName.text = widget.taskToEdit!.taskName;
+      taskDescription.text = widget.taskToEdit!.taskDescription;
+      isSwitch = widget.taskToEdit!.isSwitch;
+    }
+  }
+
+  @override
   void dispose() {
     taskName.dispose();
     taskDescription.dispose();
@@ -25,7 +37,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("New Task"),
+        title: Text(widget.taskToEdit != null ? "Edit Task" : "New Task"),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 8.w),
@@ -38,11 +50,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomText(
-                        text: "Task Name",
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textWhite,
+                      Text(
+                        "Task Name",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                       Gap(8.h),
                       CustomTextForm(
@@ -53,33 +67,38 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           }
                           return null;
                         },
-                        color: AppColors.textWhite,
+
                         text: "Finish UI design for login screen",
                       ),
                       Gap(20.h),
-                      CustomText(
-                        text: "Task Description",
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textWhite,
+                      Text(
+                        "Task Description",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                       Gap(8.h),
                       CustomTextForm(
                         controller1: taskDescription,
                         validator: (String? value) => null,
-                        color: AppColors.textWhite,
+
                         maxLines: 5,
-                        text: "Finish onboarding UI and hand off to devs by Thursday.",
+                        text:
+                            "Finish onboarding UI and hand off to devs by Thursday.",
                       ),
                       Gap(28.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CustomText(
-                            text: "High Priority",
-                            color: AppColors.textWhite,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
+                          Text(
+                            "High Priority",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           Switch(
                             value: isSwitch,
@@ -102,26 +121,45 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       taskName: taskName.text.trim(),
                       taskDescription: taskDescription.text.trim(),
                       isSwitch: isSwitch,
-                      isDone: false,
+                      isDone: widget.taskToEdit?.isDone ?? false,
                     );
 
-                    final String? storedTasks = PreferencesManager().getString('task_list');
+                    final String? storedTasks = PreferencesManager().getString(
+                      'task_list',
+                    );
                     List<TaskModel> tasks = [];
                     if (storedTasks != null && storedTasks.isNotEmpty) {
-                      final List<dynamic> decodedTasks = jsonDecode(storedTasks);
-                      tasks = decodedTasks.map((item) => TaskModel.fromJson(item)).toList();
+                      final List<dynamic> decodedTasks = jsonDecode(
+                        storedTasks,
+                      );
+                      tasks = decodedTasks
+                          .map((item) => TaskModel.fromJson(item))
+                          .toList();
                     }
-                    tasks.add(newTask);
-                    final String encoded = jsonEncode(tasks.map((e) => e.toJson()).toList());
-                 final result=   await PreferencesManager().setString('task_list', encoded);
-if(result==true){ if (context.mounted) {
-  Navigator.pop(context);
-}}
 
+                    if (widget.taskIndex != null &&
+                        widget.taskIndex! < tasks.length) {
+                      tasks[widget.taskIndex!] = newTask;
+                    } else {
+                      tasks.add(newTask);
+                    }
+
+                    final String encoded = jsonEncode(
+                      tasks.map((e) => e.toJson()).toList(),
+                    );
+                    final result = await PreferencesManager().setString(
+                      'task_list',
+                      encoded,
+                    );
+                    if (result == true) {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    }
                   }
                 },
-                icon: const Icon(Icons.add),
-                text: "Add Task",
+                icon: Icon(widget.taskToEdit != null ? Icons.save : Icons.add),
+                text: widget.taskToEdit != null ? "Save Changes" : "Add Task",
               ),
               Gap(10.h),
             ],
